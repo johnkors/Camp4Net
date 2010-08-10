@@ -63,7 +63,7 @@ namespace Camp4Net
             }
             catch (Exception e)
             {
-                return "Campfire.MailmanError: " + e.Message;
+                return "Camp4Net.MailmanError: " + e.Message;
             }
         }
     }
