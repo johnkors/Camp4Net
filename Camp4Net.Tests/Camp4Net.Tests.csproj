@@ -52,7 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="CampfireHttpModuleTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Camp4Net.Lib\Camp4Net.Lib.csproj">

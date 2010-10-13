@@ -6,7 +6,7 @@ using Moq;
 namespace Camp4Net.Tests
 {
     [TestClass]
-    public class UnitTest1
+    public class CampfireHttpModuleTests
     {
         [TestMethod]
         public void MailService_OnApplicationError_ShouldPostUserMessage()
