@@ -9,7 +9,7 @@
 <body>
     <form id="form1" runat="server">
     <div>
-    
+        <asp:FileUpload ID="fu" runat="server"  /><asp:Button id="btn" runat="server" OnClick="click"/>
     </div>
     </form>
 </body>

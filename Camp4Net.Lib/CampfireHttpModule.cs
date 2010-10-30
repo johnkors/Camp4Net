@@ -54,10 +54,10 @@ namespace Camp4Net
 
         public void OnApplicationErrorWrapper(HttpContextBase httpContextWrapper, IMailService mailService)
         {
-            string usr = httpContextWrapper.User != null ? httpContextWrapper.User.Identity.Name : "Unknown";
+            string usr = httpContextWrapper.User != null ? httpContextWrapper.User.Identity.Name : "Unknown user";
             mailService.PostSound(MessageSound.trombone);
-            mailService.PostText(string.Format("Bruker {0} opplevde feil i kontrollstasjonen!", usr));
-            mailService.PostText(string.Format("Feil: {0}", httpContextWrapper.Server.GetLastError().Message));
+            mailService.PostText(string.Format("User {0} experienced error!", usr));
+            mailService.PostText(string.Format("Exception: {0}", httpContextWrapper.Server.GetLastError().Message));
             mailService.PostText(string.Format("URL: {0}", httpContextWrapper.Request.Url));
             mailService.PostPaste(httpContextWrapper.Server.GetLastError().ToString());
         }

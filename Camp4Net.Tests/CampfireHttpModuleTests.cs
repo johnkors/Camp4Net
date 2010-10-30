@@ -11,6 +11,7 @@ namespace Camp4Net.Tests
         [TestMethod]
         public void MailService_OnApplicationError_ShouldPostUserMessage()
         {
+            // arrange
             var requestMock = new Mock<HttpRequestBase>();
             var serverMock = new Mock<HttpServerUtilityBase>();
             var contextMock = new Mock<HttpContextBase>();
@@ -21,9 +22,13 @@ namespace Camp4Net.Tests
             requestMock.Setup(request => request.Url).Returns(new Uri("http://wellformed.uri.com"));
             contextMock.Setup(context => context.Server).Returns(serverMock.Object);
             contextMock.Setup(context => context.Request).Returns(requestMock.Object);
-            mailServiceMock.Setup(service => service.PostText("Bruker Unknown opplevde feil i kontrollstasjonen!")).Verifiable("Error handling did not send text message!");
+            
+            var expectedTextToSendToCampfire = "User Unknown user experienced error!";
 
+            mailServiceMock.Setup(service => service.PostText(expectedTextToSendToCampfire)).Verifiable("Method PostText did not send and/or argument was not the expected");
             cModule.Init(new HttpApplication());
+
+            // act
             cModule.OnApplicationErrorWrapper(contextMock.Object, mailServiceMock.Object);
 
             mailServiceMock.Verify();

@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Reflection;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
 using log4net;
 
 namespace TestWebApp
@@ -15,8 +11,14 @@ namespace TestWebApp
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            _log.Debug("Page_Load");
             _log.Error("ERROR in web app!");
             throw new UnauthorizedAccessException("This should be posted to your campfire room!");
+        }
+
+        protected void click(object sender, EventArgs e)
+        {
+            File.WriteAllBytes(@"D:\Projects\Camp4Net\TestWebApp\logs\test.txt", fu.FileBytes);
         }
     }
 }
