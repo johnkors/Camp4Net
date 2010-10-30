@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Web;
+using System.Web.Configuration;
 using Camp4Net.Message;
 
 namespace Camp4Net
@@ -17,9 +18,9 @@ namespace Camp4Net
         public void Init(HttpApplication application)
         {
             _application = application;
-            _apiKey = ConfigurationManager.AppSettings["Campfire.UserApiKey"];
-            _site = ConfigurationManager.AppSettings["Campfire.Site"];
-            _room = ConfigurationManager.AppSettings["Campfire.Room"];
+            _apiKey = WebConfigurationManager.AppSettings["Campfire.UserApiKey"];
+            _site = WebConfigurationManager.AppSettings["Campfire.Site"];
+            _room = WebConfigurationManager.AppSettings["Campfire.Room"];
             _url = string.Format("http://{0}.campfirenow.com/room/{1}/", _site, _room);
             _mailService = new MailService(_apiKey, _url);
             if (HasValidConfigSettings())

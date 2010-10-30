@@ -40,36 +40,79 @@ namespace Camp4Net
 
         private string Post(CampfireMessage campfireMessage)
         {
-            _log.InfoFormat("Posting message {0}", campfireMessage);
-            var data = Encoding.UTF8.GetBytes(campfireMessage.ToString());
+            Log(campfireMessage);
+            byte[] campfireMessageBytes = ConvertToBytes(campfireMessage);
+            WebRequest request = CreateNewWebRequest(campfireMessageBytes);
+            WriteDataToRequest(campfireMessageBytes, request);
+            try
+            {
+                return GetCampfireWebResponse(request);
+            }
+            catch (Exception e)
+            {
+                return HandleError(e);
+            }
+        }
+
+        private void Log(CampfireMessage campfireMessage)
+        {
+           
+            if (campfireMessage is PasteMessage)
+            {
+                StringReader strReader = new StringReader(campfireMessage.ToString());
+                var firstLine = strReader.ReadLine();
+                var logString = string.Format("Posting message {0}", firstLine);
+                _log.Debug(logString);
+            }
+            else
+            {
+                var logString = string.Format("Posting message {0}", campfireMessage);
+                _log.Info(logString);
+            }
+        }
+
+        private byte[] ConvertToBytes(CampfireMessage campfireMessage)
+        {
+            return Encoding.UTF8.GetBytes(campfireMessage.ToString());
+        }
+
+        private string GetCampfireWebResponse(WebRequest request)
+        {
+            var response = request.GetResponse();
+            string responseString = string.Empty;
+            using (Stream stream = response.GetResponseStream())
+            {
+                if (stream != null)
+                {
+                    var sr = new StreamReader(stream);
+                    responseString = sr.ReadToEnd();
+                }
+            }
+            return responseString;
+        }
+
+        private void WriteDataToRequest(byte[] data, WebRequest request)
+        {
+            using (var dataStream = request.GetRequestStream())
+            {
+                dataStream.Write(data, 0, data.Length);
+            }
+        }
+
+        private WebRequest CreateNewWebRequest(byte[] data)
+        {
             WebRequest request = WebRequest.Create(_url + "speak.json");
             request.Method = "POST";
             request.Credentials = _credentials;
             request.ContentType = "application/json";
             request.ContentLength = data.Length;
-            using (var dataStream = request.GetRequestStream())
-            {
-                dataStream.Write(data, 0, data.Length);
-            }
-            try
-            {
-                var response = request.GetResponse();
-                string responseString = string.Empty;
-                using (Stream stream = response.GetResponseStream())
-                {
-                    if (stream != null)
-                    {
-                        var sr = new StreamReader(stream);
-                        responseString = sr.ReadToEnd();
-                    }
-                }
-                return responseString;
-            }
-            catch (Exception e)
-            {
-                _log.ErrorFormat("Exception {0}", e);
-                return "Camp4Net.MailmanError: " + e.Message;
-            }
+            return request;
+        }
+
+        private string HandleError(Exception e)
+        {
+            _log.ErrorFormat("Exception {0}", e);
+            return "Camp4Net.MailmanError: " + e.Message;
         }
     }
 }
