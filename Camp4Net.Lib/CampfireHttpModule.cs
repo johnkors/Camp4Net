@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Reflection;
 using System.Web;
 using System.Web.Configuration;
 using Camp4Net.Message;
+using log4net;
 
 namespace Camp4Net
 {
+     
     public class CampfireHttpModule : IHttpModule
     {
+        private static readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         protected string _apiKey;
         protected string _room;
         protected string _site;
@@ -20,10 +24,12 @@ namespace Camp4Net
             _apiKey = WebConfigurationManager.AppSettings["Campfire.UserApiKey"];
             _site = WebConfigurationManager.AppSettings["Campfire.Site"];
             _room = WebConfigurationManager.AppSettings["Campfire.Room"];
-            _url = string.Format("http://{0}.campfirenow.com/room/{1}/", _site, _room);
-            _mailService = new MailService(_apiKey, _url);
-            if (HasValidConfigSettings())
+
+            if (HasAllConfigSettings())
             {
+                _url = string.Format("https://{0}.campfirenow.com/room/{1}/", _site, _room);
+                _log.InfoFormat("URL:{0}",_url);
+                _mailService = new MailService(_apiKey, _url);
                 application.Error += OnApplicationError;
             }
         }
@@ -33,20 +39,24 @@ namespace Camp4Net
             
         }
 
-        private bool HasValidConfigSettings()
+        private bool HasAllConfigSettings()
         {
-            var hasAllConfigSettings = _apiKey != null && _site != null && _room != null;
+            var hasAllConfigSettings = !string.IsNullOrEmpty(_apiKey) &&
+                                       !string.IsNullOrEmpty(_site) &&
+                                       !string.IsNullOrEmpty(_room);
+                                       
             if (hasAllConfigSettings)
             {
-                Uri uri;
-                return Uri.TryCreate(_url, UriKind.Absolute, out uri);
+                _log.Info("All AppSettings present");
+                return true;
             }
             else
             {
+                _log.ErrorFormat("Lacks AppSettings or invalid AppSetting values!");
                 return false;
             }
         }
-
+       
         private void OnApplicationError(object sender, EventArgs e)
         {
             OnApplicationErrorWrapper(new HttpContextWrapper(_application.Context), _mailService);

@@ -48,9 +48,13 @@ namespace Camp4Net
             {
                 return GetCampfireWebResponse(request);
             }
+            catch(WebException e)
+            {
+                return HandleError(e, string.Format("Problems connecting to Campfire: {0}", e));
+            }
             catch (Exception e)
             {
-                return HandleError(e);
+                return HandleError(e, string.Format("Internal Camp4Net error: {0}", e));
             }
         }
 
@@ -109,9 +113,9 @@ namespace Camp4Net
             return request;
         }
 
-        private string HandleError(Exception e)
+        private string HandleError(Exception e, string msg)
         {
-            _log.ErrorFormat("Exception {0}", e);
+            _log.ErrorFormat(msg, e);
             return "Camp4Net.MailmanError: " + e.Message;
         }
     }
